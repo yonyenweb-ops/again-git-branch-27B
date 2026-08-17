@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop &mdash; MyApp</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">MyApp</a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="cart.html">Cart <span class="cart-count">0</span></a>
+      <a href="signin.html">Sign in</a>
+      <a href="signup.html" class="signup-link">Sign up</a>
+    </nav>
+  </header>
+
+  <section class="section">
+    <h2>Shop all products</h2>
+    <p class="section-subtitle">Browse our full catalog</p>
+
+    <div class="shop-toolbar">
+      <div class="category-filters" id="category-filters"></div>
+    </div>
+
+    <div class="product-grid" id="product-grid"></div>
+  </section>
+
+  <footer class="site-footer">
+    &copy; 2026 MyApp. All rights reserved.
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    const grid = document.getElementById("product-grid");
+    const filterBar = document.getElementById("category-filters");
+    const categories = ["All", ...new Set(PRODUCTS.map((p) => p.category))];
+    let activeCategory = "All";
+
+    function renderFilters() {
+      filterBar.innerHTML = "";
+      categories.forEach((cat) => {
+        const btn = document.createElement("button");
+        btn.textContent = cat;
+        btn.className = cat === activeCategory ? "active" : "";
+        btn.addEventListener("click", () => {
+          activeCategory = cat;
+          renderFilters();
+          renderGrid();
+        });
+        filterBar.appendChild(btn);
+      });
+    }
+
+    function renderGrid() {
+      grid.innerHTML = "";
+      const items = activeCategory === "All"
+        ? PRODUCTS
+        : PRODUCTS.filter((p) => p.category === activeCategory);
+
+      items.forEach((p) => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <div class="product-image">${p.emoji}</div>
+          <div class="product-info">
+            <div class="product-category">${p.category}</div>
+            <div class="product-name">${p.name}</div>
+            <div class="product-price">${formatPrice(p.price)}</div>
+            <button class="add-to-cart-btn" data-id="${p.id}">Add to cart</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    grid.addEventListener("click", (e) => {
+      if (!e.target.classList.contains("add-to-cart-btn")) return;
+      const id = Number(e.target.dataset.id);
+      addToCart(id);
+      e.target.textContent = "Added ✓";
+      e.target.classList.add("added");
+      setTimeout(() => {
+        e.target.textContent = "Add to cart";
+        e.target.classList.remove("added");
+      }, 1200);
+    });
+
+    renderFilters();
+    renderGrid();
+  </script>
+
+</body>
+</html>
