@@ -1,1 +1,6 @@
 .env
+yon.html
+# /vendor/a.php
+# /vendor/b.php
+/vendor
+
